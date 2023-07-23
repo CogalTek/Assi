@@ -16,13 +16,10 @@ int main (void)
 
     while (1) {
         if (!socket.ping()) {
-            while (!socket.ping()) {
-                sleep(1); // a revoir le sleep
-                std::cout << "Timeout: " << i++ << std::endl;
-            }
-            i = 0;
+            std::cout << "Timeout: " << i++ << std::endl;
         } else {
             std::cout << "Connecté" << std::endl;
+            i = 0;
         }
     }
 }
