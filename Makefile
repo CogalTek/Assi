@@ -18,7 +18,7 @@ endif
 
 SRC 		=	src/main.cpp						\
 				src/class/Socket.cpp				\
-				src/class/Spotify.cpp				\
+				src/class/MyOauth.cpp			\
 				src/class/Environnement.cpp			\
 
 OBJ			=	$(SRC:.cpp=.o)

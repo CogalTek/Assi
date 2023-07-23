@@ -14,12 +14,14 @@ int main (void)
     Environnement env;
     int i = 0;
 
+    while (!socket.ping()) {
+        std::cout << "Timeout: " << i++ << std::endl;
+    }
+    std::cout << "Connecté" << std::endl;
+    MyOauth temp (&env);
     while (1) {
-        if (!socket.ping()) {
+        while (!socket.ping())
             std::cout << "Timeout: " << i++ << std::endl;
-        } else {
-            std::cout << "Connecté" << std::endl;
-            i = 0;
-        }
+        i = 0;
     }
 }

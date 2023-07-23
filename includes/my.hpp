@@ -10,7 +10,7 @@
 
     #include <iostream>
     #include "class/socket.hpp"
-    #include "class/spotify.hpp"
+    #include "class/MyOauth.hpp"
     #include "class/Environnement.hpp"
 
 #endif /* !MY_HPP_ */
