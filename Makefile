@@ -18,8 +18,9 @@ endif
 
 SRC 		=	src/main.cpp						\
 				src/class/Socket.cpp				\
-				src/class/MyOauth.cpp			\
+				src/class/MyOauth.cpp				\
 				src/class/Environnement.cpp			\
+				src/class/Token.cpp 				\
 
 OBJ			=	$(SRC:.cpp=.o)
 
