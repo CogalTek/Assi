@@ -31,6 +31,7 @@
             void getCurrentSoungSpotify ();
             bool isAccessTokenValidSpotify ();
         private:
+            std::string exchangeAuthorizationCodeForAccessToken (const std::string& authorizationCode);
             Environnement *env;
             std::string auth_header;
             void get_spotify_token ();

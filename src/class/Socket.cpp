@@ -37,7 +37,7 @@ bool Socket::ping()
     return false;
 }
 
-void Socket::handleClient(int clientSocket)
+void Socket::handleClient (int clientSocket)
 {
     // Buffer pour stocker la requête HTTP
     char buffer[1024];
@@ -53,8 +53,20 @@ void Socket::handleClient(int clientSocket)
         }
     }
 
+    // Afficher la requête HTTP dans le terminal (à des fins de débogage)
+    std::cout << "Requête HTTP reçue : " << std::endl;
+    std::cout << request << std::endl;
+
+    char tmp[1024];
+    int n = std::sscanf(request.c_str(), "GET /?code=%s ", tmp);
+    env->authCode = tmp;
+
+    if (n == 1)
+        std::cout << "Code d'autorisation : " << env->authCode << std::endl;
+
     // Analyser la requête HTTP pour extraire le code d'autorisation
-    // Code à mettre en œuvre pour extraire le code d'autorisation de l'URL de la "redirect URI"
+    // Ici, vous devez ajouter le code pour extraire le code d'autorisation de l'URL de la requête.
+    // Le code d'autorisation est généralement envoyé comme paramètre dans l'URL de la "redirect URI".
 
     // Envoyer une réponse HTTP avec un message de confirmation au client
     std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n";

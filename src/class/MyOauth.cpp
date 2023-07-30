@@ -14,6 +14,61 @@ static size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::stri
     return totalSize;
 }
 
+std::string MyOauth::exchangeAuthorizationCodeForAccessToken (const std::string& authorizationCode)
+{
+    CURL* curl;
+    CURLcode res;
+    std::string accessToken;
+
+    // Initialisation de libcurl
+    curl = curl_easy_init();
+    if (!curl) {
+        std::cerr << "Erreur lors de l'initialisation de libcurl." << std::endl;
+        return "";
+    }
+
+    // URL de l'endpoint d'autorisation de Spotify
+    std::string url = "https://accounts.spotify.com/api/token";
+
+    // Données à envoyer dans la requête POST pour échanger le code d'autorisation contre le token
+    std::string postData = "grant_type=authorization_code&code=" + authorizationCode + "&client_id=" + env->client_key + "&client_secret=" + env->client_secret + "&redirect_uri=http://localhost:8888/";
+
+    // Configuration de la requête POST
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postData.c_str());
+
+    // Données de réponse
+    std::string response;
+
+    // Spécification de la fonction de rappel pour gérer les données de réponse
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, [](void* contents, size_t size, size_t nmemb, std::string* response) -> size_t {
+        size_t totalSize = size * nmemb;
+        response->append(static_cast<char*>(contents), totalSize);
+        return totalSize;
+    });
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+
+    // Exécution de la requête POST
+    res = curl_easy_perform(curl);
+
+    // Vérification des erreurs
+    if (res != CURLE_OK) {
+        std::cerr << "Erreur lors de l'exécution de la requête : " << curl_easy_strerror(res) << std::endl;
+    } else {
+        // Traitement de la réponse JSON pour extraire le token d'accès
+        // Notez que vous devrez inclure une bibliothèque JSON pour traiter la réponse JSON.
+        // Vous pouvez utiliser une bibliothèque comme nlohmann/json pour cela.
+        // Exemple : #include <nlohmann/json.hpp>
+        //          nlohmann::json jsonResponse = nlohmann::json::parse(response);
+        //          accessToken = jsonResponse["access_token"];
+    }
+
+    // Nettoyage
+    curl_easy_cleanup(curl);
+
+    return accessToken;
+}
+
 void MyOauth::get_spotify_token()
 {
     CURL* curl;
