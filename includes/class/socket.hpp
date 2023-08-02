@@ -12,6 +12,7 @@
     #include <oauth.h>
     #include <string>
     #include <cstring>
+    #include "httplib.h"
     #include <unistd.h>
     #include <sys/socket.h>
     #include <netinet/in.h>
@@ -26,7 +27,6 @@
             void setEnv (Environnement *envTmp) { env = envTmp; };
         private:
             Environnement *env;
-            void handleClient (int clientSocket);
             static const int PORT = 8888;
     };
 

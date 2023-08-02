@@ -31,7 +31,7 @@ std::string MyOauth::exchangeAuthorizationCodeForAccessToken (const std::string&
     std::string url = "https://accounts.spotify.com/api/token";
 
     // Données à envoyer dans la requête POST pour échanger le code d'autorisation contre le token
-    std::string postData = "grant_type=authorization_code&code=" + authorizationCode + "&client_id=" + env->client_key + "&client_secret=" + env->client_secret + "&redirect_uri=http://localhost:8888/";
+    std::string postData = "grant_type=authorization_code&code=" + authorizationCode + "&client_id=" + env->client_key + "&client_secret=" + env->client_secret + "&redirect_uri=http://localhost:8888/callback";
 
     // Configuration de la requête POST
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
@@ -86,7 +86,7 @@ void MyOauth::get_spotify_token()
 
     // Paramètres requis pour l'authentification (à adapter en fonction de votre application)
     std::string clientId = env->client_key;
-    std::string redirectUri = "https://github.com/CogalTek/Assi";
+    std::string redirectUri = "http://localhost:8888/callback";
     std::string scope = "user-read-private user-read-email"; // Liste des autorisations requises, séparées par des espaces
 
     // Construire l'URL d'authentification avec les paramètres
@@ -103,7 +103,7 @@ void MyOauth::get_spotify_token()
     std::string tokenUrl = "https://accounts.spotify.com/api/token";
 
     // Construire les données à envoyer dans la requête POST pour obtenir le jeton d'accès
-    std::string postData = "grant_type=authorization_code&code=" + env->authCode + "&redirect_uri=" + redirectUri + "&client_id=" + clientId + "&client_secret=VOTRE_CLIENT_SECRET";
+    std::string postData = "grant_type=authorization_code&code=" + env->authCode + "&redirect_uri=" + redirectUri + "&client_id=" + clientId + "&client_secret=" + env->client_secret;
 
     // Liste d'en-têtes personnalisée pour spécifier le type de contenu de la requête
     struct curl_slist* headers = nullptr;

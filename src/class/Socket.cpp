@@ -16,7 +16,7 @@ Socket::~Socket()
 {
 }
 
-bool Socket::ping()
+bool Socket::ping ()
 {
     CURL *curl;
     CURLcode res;
@@ -37,94 +37,30 @@ bool Socket::ping()
     return false;
 }
 
-void Socket::handleClient (int clientSocket)
-{
-    // Buffer pour stocker la requête HTTP
-    char buffer[1024];
-    std::string request;
-
-    // Lire la requête HTTP depuis le client
-    ssize_t bytesRead;
-    while ((bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0)) > 0) {
-        request += std::string(buffer, bytesRead);
-        if (request.find("\r\n\r\n") != std::string::npos) {
-            // Fin de la requête HTTP
-            break;
-        }
-    }
-
-    // Afficher la requête HTTP dans le terminal (à des fins de débogage)
-    std::cout << "Requête HTTP reçue : " << std::endl;
-    std::cout << request << std::endl;
-
-    char tmp[1024];
-    int n = std::sscanf(request.c_str(), "GET /?code=%s ", tmp);
-    env->authCode = tmp;
-
-    if (n == 1)
-        std::cout << "Code d'autorisation : " << env->authCode << std::endl;
-
-    // Analyser la requête HTTP pour extraire le code d'autorisation
-    // Ici, vous devez ajouter le code pour extraire le code d'autorisation de l'URL de la requête.
-    // Le code d'autorisation est généralement envoyé comme paramètre dans l'URL de la "redirect URI".
-
-    // Envoyer une réponse HTTP avec un message de confirmation au client
-    std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n";
-    response += "<html><body><h1>Authentification réussie ! Vous pouvez maintenant fermer cette fenêtre.</h1></body></html>";
-    send(clientSocket, response.c_str(), response.size(), 0);
-
-    // Fermer la connexion avec le client
-    close(clientSocket);
-}
-
 void Socket::thread_server ()
 {
-    int serverSocket, clientSocket;
-    struct sockaddr_in serverAddr, clientAddr;
-    socklen_t clientAddrLen = sizeof(clientAddr);
+    // Créer une instance du serveur web
+    httplib::Server server;
 
-    // Créer le socket du serveur
-    serverSocket = socket(AF_INET, SOCK_STREAM, 0);
-    if (serverSocket < 0) {
-        std::cerr << "Erreur lors de la création du socket." << std::endl;
-        return;
-    }
+    // Route pour gérer la réponse de redirection de Spotify
+    server.Get("/callback", [&](const httplib::Request& req, httplib::Response& res) {
+        // Extraire le code d'autorisation de l'URL de la requête
+        std::string authorizationCode = req.get_param_value("code");
 
-    // Configuration de l'adresse du serveur
-    serverAddr.sin_family = AF_INET;
-    serverAddr.sin_addr.s_addr = INADDR_ANY;
-    serverAddr.sin_port = htons(PORT);
+        // Afficher le code d'autorisation dans le terminal (à des fins de débogage)
+        std::cout << "Code d'autorisation : " << authorizationCode << std::endl;
 
-    // Lier le socket du serveur à l'adresse
-    if (bind(serverSocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0) {
-        std::cerr << "Erreur lors de la liaison du socket à l'adresse." << std::endl;
-        close(serverSocket);
-        return;
-    }
+        // Stocker le code d'autorisation dans l'environnement
+        env->authCode = authorizationCode;
 
-    // Mettre le socket en écoute
-    if (listen(serverSocket, 1) < 0) {
-        std::cerr << "Erreur lors de la mise en écoute du socket." << std::endl;
-        close(serverSocket);
-        return;
-    }
+        // Envoyer une réponse HTTP avec un message de confirmation au client
+        res.set_content("Authentification réussie ! Vous pouvez maintenant fermer cette fenêtre.", "text/html");
 
-    std::cout << "Serveur en attente de connexions sur le port " << PORT << "..." << std::endl;
+        // Arrêter le serveur web après avoir reçu le code d'autorisation
+        server.stop();
+    });
 
-    while (true) {
-        // Accepter les connexions entrantes
-        clientSocket = accept(serverSocket, (struct sockaddr*)&clientAddr, &clientAddrLen);
-        if (clientSocket < 0) {
-            std::cerr << "Erreur lors de l'acceptation de la connexion entrante." << std::endl;
-            continue;
-        }
-
-        // Gérer la connexion avec le client dans un thread séparé
-        handleClient(clientSocket);
-    }
-
-    // Fermer le socket du serveur
-    close(serverSocket);
-
-    return;
+    // Démarrer le serveur web sur le port 8888 (ou tout autre port de votre choix)
+    server.listen("localhost", 8888);
 }
+
