@@ -128,7 +128,7 @@ void MyOauth::get_spotify_token()
         std::cerr << "Erreur lors de l'exécution de la requête : " << curl_easy_strerror(res) << std::endl;
     } else {
         // Affichage de la réponse (qui contient le jeton d'accès)
-        std::cout << "Réponse du serveur : " << std::endl;
+        std::cout << "Réponse du serveur01: " << std::endl;
         std::cout << response << std::endl;
 
         // Analyser la réponse JSON pour extraire le jeton d'accès et d'autres informations nécessaires
