@@ -24,12 +24,15 @@ int main (void)
         socketPtr->thread_server ();
     });
     MyOauth temp (&env);
-    while (1) {
-        if (temp.isAccessTokenValidSpotify()) {
-            temp.getCurrentSoungSpotify();
-        } else {
-            std::cout << "Le jeton d'accès n'est pas valide." << std::endl;
-        }
-    }
+    std::cout << "debug quit MyOauth" << std::endl;
+    // while (1);
+    // while (1) {
+    //     std::cout << "debug Entre dans la boucle" << std::endl;
+    //     if (temp.isAccessTokenValidSpotify()) {
+    //         temp.getCurrentSoungSpotify();
+    //     } else {
+    //         std::cout << "Le jeton d'accès n'est pas valide." << std::endl;
+    //     }
+    // }
     monThread.join();
 }

@@ -258,5 +258,5 @@ MyOauth::MyOauth (Environnement *envTmp)
 
 MyOauth::~MyOauth ()
 {
-    delete (spotify_token);
+    // delete (spotify_token);
 }

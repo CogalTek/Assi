@@ -72,4 +72,5 @@ void Socket::thread_server ()
     // Démarrer le serveur web sur le port 8888 (ou tout autre port de votre choix)
     server.listen("127.0.0.1", 8888);
     std::cout << "thread_server end" << std::endl;
+    return;
 }
