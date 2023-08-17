@@ -25,6 +25,7 @@ int main (void)
     });
     MyOauth temp (&env);
     std::cout << "debug quit MyOauth" << std::endl;
+    temp.getCurrentSoungSpotify();
     // while (1);
     // while (1) {
     //     std::cout << "debug Entre dans la boucle" << std::endl;

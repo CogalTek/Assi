@@ -131,8 +131,7 @@ void MyOauth::get_spotify_token()
         std::cout << "Réponse du serveur01: " << std::endl;
         std::cout << response << std::endl;
 
-        // Analyser la réponse JSON pour extraire le jeton d'accès et d'autres informations nécessaires
-        // (code à mettre en œuvre pour votre propre logique d'extraction des données)
+        spotify_token = new Token (response);
     }
 
     // Nettoyage
@@ -156,13 +155,14 @@ void MyOauth::getCurrentSoungSpotify ()
         return;
     }
 
+
     // URL de la requête GET pour les informations sur la musique en cours de lecture
     std::string url = "https://api.spotify.com/v1/me/player/currently-playing";
 
     // Ajoutez votre jeton d'accès à l'en-tête d'autorisation
-    std::string accessToken = spotify_token->access_token;
-    std::string authHeader = "Authorization: Bearer " + accessToken;
-
+    std::cout << "debug getCurrentSoungSpotify" << std::endl;
+    std::string authHeader = "Authorization: Bearer " + spotify_token->access_token;
+    std::cout << "debug 02 getCurrentSoungSpotify" << std::endl;
     // Liste d'en-têtes personnalisée
     struct curl_slist* headers = nullptr;
     headers = curl_slist_append(headers, authHeader.c_str());
@@ -258,5 +258,5 @@ MyOauth::MyOauth (Environnement *envTmp)
 
 MyOauth::~MyOauth ()
 {
-    // delete (spotify_token);
+    delete (spotify_token);
 }
