@@ -18,22 +18,13 @@ int main (void)
 
     while (!socket.ping())
         std::cout << "Timeout: " << i++ << std::endl;
-    std::cout << "Connecté" << std::endl;
-    std::cout << "debug adresse abc : " << &socket << std::endl;
     std::thread monThread([socketPtr]() {
         socketPtr->thread_server ();
     });
     MyOauth temp (&env);
-    std::cout << "debug quit MyOauth" << std::endl;
-    temp.getCurrentSoungSpotify();
-    // while (1);
-    // while (1) {
-    //     std::cout << "debug Entre dans la boucle" << std::endl;
-    //     if (temp.isAccessTokenValidSpotify()) {
-    //         temp.getCurrentSoungSpotify();
-    //     } else {
-    //         std::cout << "Le jeton d'accès n'est pas valide." << std::endl;
-    //     }
-    // }
+    while (1) {
+        temp.getCurrentSoungSpotify();
+        sleep(10);
+    }
     monThread.join();
 }

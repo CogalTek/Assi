@@ -9,7 +9,6 @@
 
 Environnement::Environnement ()
 {
-    std::cout << "debug adresse " << &this->authCode << std::endl;
 }
 
 Environnement::~Environnement ()

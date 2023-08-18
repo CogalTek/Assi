@@ -14,6 +14,7 @@
     #include <string>
     #include <curl/curl.h>
     #include <nlohmann/json.hpp>
+    #include <cstdlib>
 
     class Token {
         public:
@@ -36,6 +37,7 @@
             std::string auth_header;
             void get_spotify_token ();
             Token *spotify_token;
+            void openLinkInBrowser(const std::string link);
     };
 
 #endif /* !MY_OAUTH_HPP_ */

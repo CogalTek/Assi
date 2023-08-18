@@ -6,6 +6,31 @@
 */
 
 #include "MyOauth.hpp"
+using json = nlohmann::json;
+
+void MyOauth::openLinkInBrowser (const std::string link)
+{
+    std::string command;
+
+    // Vérifier le système d'exploitation
+    #ifdef _WIN32
+        // Windows
+        command = "start \"" + link + "\"";
+    #elif __APPLE__
+        // macOS
+        command = "open \"" + link + "\"";
+    #else
+        // Autres systèmes (Linux, etc.)
+        command = "xdg-open \"" + link + "\"";
+    #endif
+
+    // Exécuter la commande pour ouvrir le lien dans le navigateur par défaut
+    int result = system(command.c_str());
+
+    if (result != 0) {
+        std::cerr << "Erreur lors de l'ouverture du lien." << std::endl;
+    }
+}
 
 static size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::string* response)
 {
@@ -87,14 +112,13 @@ void MyOauth::get_spotify_token()
     // Paramètres requis pour l'authentification (à adapter en fonction de votre application)
     std::string clientId = env->client_key;
     std::string redirectUri = "http://localhost:8888/callback";
-    std::string scope = "user-read-private user-read-email"; // Liste des autorisations requises, séparées par des espaces
+    std::string scope = "user-read-private user-read-email user-read-currently-playing user-read-playback-state"; // Liste des autorisations requises, séparées par des espaces
 
     // Construire l'URL d'authentification avec les paramètres
     std::string authRequestUrl = authUrl + "?client_id=" + clientId + "&redirect_uri=" + redirectUri + "&response_type=code&scope=" + scope;
 
-    // Afficher l'URL d'authentification pour que l'utilisateur puisse le visiter et donner son consentement
-    std::cout << "Visitez cette URL dans votre navigateur pour donner votre consentement : " << std::endl;
-    std::cout << authRequestUrl << std::endl;
+    // ouvrir le navigateur puis consulter l'URL d'authentification pour que l'utilisateur puisse le visiter et donner son consentement
+    openLinkInBrowser(authRequestUrl);
 
     // Demander à l'utilisateur de copier le code de réponse après avoir donné son consentement
     while (env->authCode == "");
@@ -126,13 +150,8 @@ void MyOauth::get_spotify_token()
     // Vérification des erreurs
     if (res != CURLE_OK) {
         std::cerr << "Erreur lors de l'exécution de la requête : " << curl_easy_strerror(res) << std::endl;
-    } else {
-        // Affichage de la réponse (qui contient le jeton d'accès)
-        std::cout << "Réponse du serveur01: " << std::endl;
-        std::cout << response << std::endl;
-
+    } else
         spotify_token = new Token (response);
-    }
 
     // Nettoyage
     curl_slist_free_all(headers); // Libération de la mémoire utilisée par la liste d'en-têtes
@@ -144,7 +163,6 @@ void MyOauth::get_spotify_token()
 
 void MyOauth::getCurrentSoungSpotify ()
 {
-    std::cout << "getCurrentSoungSpotify" << std::endl;
     CURL* curl;
     CURLcode res;
 
@@ -160,9 +178,7 @@ void MyOauth::getCurrentSoungSpotify ()
     std::string url = "https://api.spotify.com/v1/me/player/currently-playing";
 
     // Ajoutez votre jeton d'accès à l'en-tête d'autorisation
-    std::cout << "debug getCurrentSoungSpotify" << std::endl;
     std::string authHeader = "Authorization: Bearer " + spotify_token->access_token;
-    std::cout << "debug 02 getCurrentSoungSpotify" << std::endl;
     // Liste d'en-têtes personnalisée
     struct curl_slist* headers = nullptr;
     headers = curl_slist_append(headers, authHeader.c_str());
@@ -186,8 +202,17 @@ void MyOauth::getCurrentSoungSpotify ()
         std::cerr << "Erreur lors de l'exécution de la requête : " << curl_easy_strerror(res) << std::endl;
     } else {
         // Affichage de la réponse (qui contiendra les informations sur la musique en cours de lecture)
-        std::cout << "Réponse du serveur : " << std::endl;
-        std::cout << response << std::endl;
+        try {
+            json jsonResponse = json::parse(response);
+
+            std::string songName = jsonResponse["item"]["name"];
+            std::string artistName = jsonResponse["item"]["artists"][0]["name"];
+
+            std::cout << "Nom de la chanson : " << songName << std::endl;
+            std::cout << "Artiste : " << artistName << std::endl;
+        } catch (const json::exception& e) {
+            std::cerr << "Erreur lors de l'analyse JSON : " << e.what() << std::endl;
+        }
     }
 
     // Nettoyage
