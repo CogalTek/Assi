@@ -11,15 +11,20 @@
 int main (void)
 {
     Socket socket;
+    Socket *socketPtr = &socket;
     Environnement env;
+    socket.setEnv(&env);
     int i = 0;
 
+    while (!socket.ping())
+        std::cout << "Timeout: " << i++ << std::endl;
+    std::thread monThread([socketPtr]() {
+        socketPtr->thread_server ();
+    });
+    MyOauth temp (&env);
     while (1) {
-        if (!socket.ping()) {
-            std::cout << "Timeout: " << i++ << std::endl;
-        } else {
-            std::cout << "Connecté" << std::endl;
-            i = 0;
-        }
+        temp.getCurrentSoungSpotify();
+        sleep(10);
     }
+    monThread.join();
 }
